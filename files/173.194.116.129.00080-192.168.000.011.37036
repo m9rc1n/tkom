@@ -1,7 +1,0 @@
-HTTP/1.1 304 Not Modified
-Date: Sun, 23 Mar 2014 08:38:40 GMT
-Expires: Sun, 23 Mar 2014 20:38:40 GMT
-Age: 33303
-Server: GFE/2.0
-Alternate-Protocol: 80:quic
-
