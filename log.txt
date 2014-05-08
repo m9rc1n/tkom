@@ -1,0 +1,21 @@
+192.168.000.011.34365-212.110.187.115.00080 ; GET ; www.technomancy.org ; /networking/tcpflow-howto-see-network-traffic/  ; 
+192.168.000.011.34371-212.110.187.115.00080 ; GET ; www.abc.org ; /css/all.css  ; 
+192.168.000.011.36198-173.194.070.095.00080 ; GET ; fonts.googleapis.com ; /css?family=Ubuntu:regular,bold&subset=Latin  ; 476
+192.168.000.011.37036-173.194.116.129.00080 ; CONNECT ; www.google-analytics.com ; /ga.js  ; 
+192.168.000.011.39677-098.136.223.068.00080 ; GET ; bcp-usw44.zenfs.com ; /ysbp/img/delicious.small.gif?noredirect=1&visited=gops.use44.mobstor.vip.bf1.yahoo.com  ; 
+192.168.000.011.43192-173.194.112.204.00080 ; GET ; themes.googleusercontent.com ; /static/fonts/ubuntu/v5/0ihfXUL2emPh0ROJezvraD8E0i7KZn-EPnyo3HZu7kw.woff  ; 
+192.168.000.011.59142-066.196.065.174.00080 ; GET ; l.yimg.com ; /hr/img/delicious.small.gif  ; 
+192.168.000.011.34365-212.110.187.115.00080 ; GET ; www.technomancy.org ; /networking/tcpflow-howto-see-network-traffic/  ; 
+192.168.000.011.34371-212.110.187.115.00080 ; GET ; www.abc.org ; /css/all.css  ; 
+192.168.000.011.36198-173.194.070.095.00080 ; GET ; fonts.googleapis.com ; /css?family=Ubuntu:regular,bold&subset=Latin  ; 476
+192.168.000.011.37036-173.194.116.129.00080 ; CONNECT ; www.google-analytics.com ; /ga.js  ; 
+192.168.000.011.39677-098.136.223.068.00080 ; GET ; bcp-usw44.zenfs.com ; /ysbp/img/delicious.small.gif?noredirect=1&visited=gops.use44.mobstor.vip.bf1.yahoo.com  ; 
+192.168.000.011.43192-173.194.112.204.00080 ; GET ; themes.googleusercontent.com ; /static/fonts/ubuntu/v5/0ihfXUL2emPh0ROJezvraD8E0i7KZn-EPnyo3HZu7kw.woff  ; 
+192.168.000.011.59142-066.196.065.174.00080 ; GET ; l.yimg.com ; /hr/img/delicious.small.gif  ; 
+192.168.000.011.34365-212.110.187.115.00080 ; GET ; www.technomancy.org ; /networking/tcpflow-howto-see-network-traffic/  ; 
+192.168.000.011.34371-212.110.187.115.00080 ; GET ; www.abc.org ; /css/all.css  ; 
+192.168.000.011.36198-173.194.070.095.00080 ; GET ; fonts.googleapis.com ; /css?family=Ubuntu:regular,bold&subset=Latin  ; 476
+192.168.000.011.37036-173.194.116.129.00080 ; CONNECT ; www.google-analytics.com ; /ga.js  ; 
+192.168.000.011.39677-098.136.223.068.00080 ; GET ; bcp-usw44.zenfs.com ; /ysbp/img/delicious.small.gif?noredirect=1&visited=gops.use44.mobstor.vip.bf1.yahoo.com  ; 
+192.168.000.011.43192-173.194.112.204.00080 ; GET ; themes.googleusercontent.com ; /static/fonts/ubuntu/v5/0ihfXUL2emPh0ROJezvraD8E0i7KZn-EPnyo3HZu7kw.woff  ; 
+192.168.000.011.59142-066.196.065.174.00080 ; GET ; l.yimg.com ; /hr/img/delicious.small.gif  ; 
