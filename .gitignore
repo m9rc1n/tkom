@@ -20,3 +20,6 @@
 *.out
 *.app
 files/*
+output/*
+bin/*
+obj/*

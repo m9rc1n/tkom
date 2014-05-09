@@ -52,11 +52,11 @@ bool isRequestFileNameIncorrect (std::string filename) {
 	return true;
 }
 
-void checkDirectory(std::string path) {
+void checkDirectory(std::string stat_file, std::string stat_directory, std::string input_directory, std::string output_directory) {
 	// raportuj rozpoczecie skanowania
 	// report (SCAN_RESULT, STARTED);
 	// lista plikow w zadanym katalogu
-	std::vector<std::string> files = getFilesFromDirectory(path);
+	std::vector<std::string> files = getFilesFromDirectory(input_directory);
 	// petla skanujaca dany katalog
 
 	for(std::vector<std::string>::iterator file = files.begin(); file != files.end(); file++) {
@@ -69,9 +69,9 @@ void checkDirectory(std::string path) {
 		// rozpocznij sesje z danym plikiem
 		// sprawdz, czy zadany plik zawiera zadanie HTTP
 		report (START, *file);
-		long request_state = request("files/", *file);
+		long request_state = request(input_directory, *file);
 		report (REQUEST_RESULT, request_state);
-		long response_state = response("files/", getResponseFileFromRequestFile(*file));
+		long response_state = response(input_directory, getResponseFileFromRequestFile(*file));
 		report (RESPONSE_RESULT, response_state);
 		report (FINISH, "log.txt");
 	}

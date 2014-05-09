@@ -1,15 +1,26 @@
-CXX = clang++
-CXXFLAGS = -O2 -Wall -DVDBG
-LDFLAGS = -lpthread
-OBJS = file.o file_name.o request.o response.o ui.o log.o main.o
+TARGET   = http_version
+CC       = clang++
+# compiling flags here
+CFLAGS   = -Wall -I.
 
-all: http_parser
+LINKER   = clang++ -o
+# linking flags here
+LFLAGS   = -Wall -I. -lm
 
-%.o:%.c
-	$(CXX) $(CXXFLAGS) $< -c -o $@
+# change these to set the proper directories where each files shoould be
+SRCDIR   = src
+OBJDIR   = obj
+BINDIR   = bin
 
-http_parser: $(OBJS)
-	$(CXX) $(OBJS) $(LDFLAGS) -o http_parser
+SOURCES  := $(wildcard $(SRCDIR)/*.cpp)
+INCLUDES := $(wildcard $(SRCDIR)/*.hpp)
+OBJECTS  := $(SOURCES:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+rm       = rm -f
 
-clean:
-	rm -rf *.o http_parser
+$(BINDIR)/$(TARGET): $(OBJECTS)
+	@$(LINKER) $@ $(LFLAGS) $(OBJECTS)
+	@echo "Linking complete!"
+
+$(OBJECTS): $(OBJDIR)/%.o : $(SRCDIR)/%.cpp
+	@$(CC) $(CFLAGS) -c $< -o $@
+	@echo "Compiled "$<" successfully!"
