@@ -1,0 +1,1291 @@
+\documentclass[a4paper,11pt]{report} 
+\usepackage[utf8x]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[polish]{babel}
+\author{Marcin Urbański, nr indeksu 237506}
+\usepackage{listings}
+\usepackage{color}
+\usepackage{ucs}
+\usepackage{graphicx}
+
+\definecolor{mygreen}{rgb}{0,0.6,0}
+\definecolor{mygray}{rgb}{0.5,0.5,0.5}
+\definecolor{mymauve}{rgb}{0.58,0,0.82}
+
+\lstset{ 
+  backgroundcolor=\color{white},   % choose the background color; you must add \usepackage{color} or \usepackage{xcolor}
+  basicstyle=\footnotesize,        % the size of the fonts that are used for the code
+  breakatwhitespace=false,         % sets if automatic breaks should only happen at whitespace
+  breaklines=true,                 % sets automatic line breaking
+  captionpos=b,                    % sets the caption-position to bottom
+  commentstyle=\color{mygreen},    % comment style
+  deletekeywords={...},            % if you want to delete keywords from the given language
+  escapeinside={\%*}{*)},          % if you want to add LaTeX within your code
+  extendedchars=true,              % lets you use non-ASCII characters; for 8-bits encodings only, does not work with UTF-8
+  frame=single,                    % adds a frame around the code
+  keepspaces=true,                 % keeps spaces in text, useful for keeping indentation of code (possibly needs columns=flexible)
+  morekeywords={*,...},            % if you want to add more keywords to the set
+  numbers=none,                    % where to put the line-numbers; possible values are (none, left, right)
+  numbersep=5pt,                   % how far the line-numbers are from the code
+  numberstyle=\tiny\color{mygray}, % the style that is used for the line-numbers
+  rulecolor=\color{black},         % if not set, the frame-color may be changed on line-breaks within not-black text (e.g. comments (green here))
+  showspaces=false,                % show spaces everywhere adding particular underscores; it overrides 'showstringspaces'
+  showstringspaces=false,          % underline spaces within strings only
+  showtabs=false,                  % show tabs within strings adding particular underscores
+  stepnumber=2,                    % the step between two line-numbers. If it's 1, each line will be numbered
+  stringstyle=\color{mymauve},     % string literal style
+  tabsize=2,                       % sets default tabsize to 2 spaces  
+  language=C,
+  extendedchars=\true,
+  literate={ą}{{\k{a}}}1
+             {Ą}{{\k{A}}}1
+             {ę}{{\k{e}}}1
+             {Ę}{{\k{E}}}1
+             {ó}{{\'o}}1
+             {Ó}{{\'O}}1
+             {ś}{{\'s}}1
+             {Ś}{{\'S}}1
+             {ł}{{\l{}}}1
+             {Ł}{{\L{}}}1
+             {ż}{{\.z}}1
+             {Ż}{{\.Z}}1
+             {ź}{{\'z}}1
+             {Ź}{{\'Z}}1
+             {ć}{{\'c}}1
+             {Ć}{{\'C}}1
+             {ń}{{\'n}}1
+             {Ń}{{\'N}}1
+}
+
+
+\begin{document}
+\begin{titlepage}
+\begin{center}
+\begin{Huge}
+	\emph{Projekt z przedmiotu:}
+	\\
+	\textbf{Techniki Kompilacji}
+\end{Huge}
+\begin{normalsize}
+	\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.
+	\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\.\\
+	autor: Marcin Urbański
+	\\
+	nr albumu: 237506
+	\\
+	opiekun: dr inż. Krzysztof Cabaj
+\end{normalsize}		
+\end{center}
+\end{titlepage}
+
+
+\chapter{Wstęp}
+
+\section{Treść zadania 5.}
+
+Celem zadania jest sparsowanie plików znajdujących się w podanym katalogu (pliki tekstowe i
+binarne) i wykrycie tych, które zawierają poprawne żądania protokołu HTTP. 
+
+Dla wykrytych sesji HTTP
+należy odnaleźć plik z odpowiedzią (nazwy plików zawierają adresy i porty źródłowe i docelowy,
+odpowiedź ma je w odwrotnej kolejności) i zapisać przesłane dane (bez nagłówków odpowiedzi
+HTTP) w oddzielnym pliku. 
+
+Dodatkowo program powinien tworzyć plik statystyki i dla każdej wykrytej
+sesji zapisywać w jednej linii istotne informacje: 
+
+\begin{itemize}
+\item
+	nazwę pliku z żądaniem HTTP
+\item
+	metodę
+\item
+    URL
+\item
+    wielkość pliku
+\item
+    nazwę pliku z przesyłaną treścią
+\end{itemize}
+	
+\section{Interpretacja zadania}
+
+W ramach projektu zostanie wykonany program, którego zadaniem jest sprawdzenie czy pliku z zadanego katalogu zawierają poprawne żądania i odpowiedzi HTTP. Prezentowany poniżej program jest parserem, którego zadaniem jest również gromadzenie informacji o przeszukiwanych plikach i znalezionych sesjach. Pliki służące do testowania programu zostaną wygenerowane za pomocą programu tcpflow. Zadanie zostanie wykonane obiektowo w języku C++. Stworzone zostaną klasy, odpowiadające opisanym niżej modułom.
+
+\section{Dodatkowe biblioteki}
+
+Zamierzam skorzystać jedynie z biblioteki boost, w celu pobrania listy plików z danego katalogu.
+
+\section{Obsługiwane systemy}
+
+Program powinien działać zarówno pod Linuxem, jak i Windowsem
+\\ Testowane na:
+
+\section{Przykładowe poprawne żądanie HTTP}
+
+\begin{lstlisting}
+
+GET /css/all.css HTTP/1.1
+Host: www.abc.org
+Connection: keep-alive
+Cache-Control: max-age=0
+Accept: text/css,*/*;q=0.1
+If-None-Match: "2f759-38a-49d87fa295080"
+If-Modified-Since: Wed, 02 Mar 2011 23:07:30 GMT
+User-Agent: Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/33.0.1750.152 Safari/537.36
+DNT: 1
+Referer: http://www.abc.org/
+Accept-Encoding: gzip,deflate,sdch
+Accept-Language: en-US,en;q=0.8,pl;q=0.6
+Cookie: __utma=260800520.62948572.1395226092.1395248356.1395597204.3; __utmb=260800520.1.10.1395597204; __utmc=260800520; __utmz=260800520.1395597204.3.3.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided)
+
+.
+\end{lstlisting}
+
+\section{Przykładowa poprawna odpowiedź HTTP}
+
+\begin{lstlisting}
+
+HTTP/1.1 200 OK
+Content-Type: text/css
+Timing-Allow-Origin: *
+Expires: Sun, 23 Mar 2014 17:53:43 GMT
+Date: Sun, 23 Mar 2014 17:53:43 GMT
+Cache-Control: private, max-age=86400
+Content-Length: 476
+X-Content-Type-Options: nosniff
+X-Frame-Options: SAMEORIGIN
+X-XSS-Protection: 1; mode=block
+Server: GSE
+Alternate-Protocol: 80:quic
+
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 400;
+  src: local('Ubuntu'), url(http://themes.googleusercontent.com/static/fonts/ubuntu/v5/_xyN3apAT_yRRDeqB3sPRg.woff) format('woff');
+}
+@font-face {
+  font-family: 'Ubuntu';
+  font-style: normal;
+  font-weight: 700;
+  src: local('Ubuntu Bold'), local('Ubuntu-Bold'), url(http://themes.googleusercontent.com/static/fonts/ubuntu/v5/0ihfXUL2emPh0ROJezvraD8E0i7KZn-EPnyo3HZu7kw.woff) format('woff');
+}
+
+\end{lstlisting}
+
+\chapter{Moduły}
+
+\section{Wczytywanie plików wraz z analizą treści}
+
+Moduł odpowiedzialny za sprawdzenie plików w danym katalogu. Wywołuje on również moduły odpowiedzialne za sprawdzenie poprawności żądań i odpowiedzi HTTP.
+
+\subsection{Pseudokod funkcji checkDirectory()}
+
+\begin{lstlisting}
+
+ void checkDirectory(String directory) {
+   // raportuj rozpoczęcie skanowania
+   Log.report (SCAN_RESULT, STARTED);
+   // lista plików w zadanym katalogu
+   String files[] = getFilesFromDirectory(directory);
+   // pętla skanująca dany katalog
+   for(int i=0; i<files.size(); i++) {
+     // jeśli plik nie ma poprawnej nazwy
+     // przejdź do kolejnego
+     if (isRequestFileNameIncorrect(files[i])) {
+       continue;
+     }   
+     // uzyskaj deskryptor pliku 
+     File requestFile = new File(file[i]);  
+     // rozpocznij sesję z danym plikiem
+     Log.start (requestFile);
+     // sprawdź, czy zadany plik zawiera żądanie HTTP
+     int stateRequest = Request(requestFile);
+     // raportuj rezultat sprawdzania żądania HTTP
+     Log.report (REQUEST_RESULT, stateRequest);
+     // zwróć deskryptor pliku z odpowiedzią
+     File responseFile = \
+         getResponseFileFromRequestFile(requestFile);
+     // sprawdź, czy zadany plik zawiera odpowiedź HTTP
+     int stateResponse = Response(responseFile);
+     // raportuj rezultat sprawdzania odpowiedzi HTTP
+     Log.report (RESPONSE_RESULT, stateResponse);
+     // zakończ sesję dla danego pliku
+     Log.finish ();
+   }
+   // raportuj stan skanowania
+   Log.report (SCAN_RESULT, FINISHED);
+ }
+
+\end{lstlisting}
+
+\subsection{Poprawna nazwa pliku}
+
+\begin{lstlisting}
+
+ file_name = source "-" destination
+ 
+ source = source_address "." source_port
+ source_address = 3DIGIT "." 3DIGIT "." 3DIGIT "." 3DIGIT
+ source_port = 5DIGIT
+ 
+ destination = destination_address "." destination_port
+ destination_address = 3DIGIT "." 3DIGIT "." 3DIGIT "." 3DIGIT
+ destination_port = 5DIGIT
+
+\end{lstlisting}
+
+\subsection{Przykładowe nazwy plików}
+
+\begin{lstlisting}
+
+ 023.061.248.090.00443-192.168.000.011.54796
+ 023.061.248.096.00443-192.168.000.011.56132
+ // request
+ 192.168.000.011.39677-098.136.223.068.00080
+ // response
+ 098.136.223.068.00080-192.168.000.011.39677
+
+\end{lstlisting}
+
+\subsection{Pseudokod funkcji isRequestFileNameIncorrect()}
+
+Zwraca true, jeśli dany plik ma niepoprawną nazwę
+
+\begin{lstlisting}
+
+ bool isRequestFileNameIncorrect (File filename) {
+   // indeks znaku rozdzielającego
+   int indexOfSeparator = getPositionOf(filename, '-');
+   // jeśli nie znaleziono znaku rozdzielającego
+   if (indexOfSeparator == NOT_FOUND) {
+     return true;
+   }
+   // sprawdzaj port i adres źródłowy
+   if (source (filename.substring(0, indexOfSeparator)) {
+     // sprawdź port i adres docelowy
+     if (destination (filename.substr (indexOfSeparator+1)) {
+       // zwróć informację o poprawnej nazwie pliku
+       return false;
+     }
+   }
+   // plik niepoprawny
+   return true;
+ }
+
+\end{lstlisting}
+
+\begin{lstlisting}
+
+ bool source (String source) {
+   // sprawdź adres i port źródłowy
+   if (checkAddressAndPort (source)) {
+     return true;
+   } else {
+     return false;
+   }
+ }
+ 
+ bool destination (String destination) {
+   // sprawdź adres i port docelowy
+   if (checkAddressAndPort (destination)) {
+     return true;
+   } else {
+     return false;
+   }
+ }
+\end{lstlisting}
+
+\begin{lstlisting}
+
+ bool checkAddressAndPort (String text) {  
+   // sprawdź poprawność adresu
+   for (int i=0; i < 4; i++) {
+     // pierwszy segment adresu
+     int address_segment = atoi(text.substr(i*4, i*4+3);
+     // sprawdź czy mieści się w zakresie
+     if (address_segment > 255 || address_segment < 0) {
+       return false;
+     }
+     // sprawdź czy są wymagne kropki
+     if (text [i*4+3] != '.') {
+       return false;
+     } 
+   }
+   // sprawdź poprawność portu
+   int port = atoi(text.substr(i*4);
+   // sprawdź zakres portu
+   if (port > 65535 || port < 0) {
+       return false;
+   }
+   // zwróć informacje o sukcesie
+   return true;
+ }
+
+\end{lstlisting}
+
+\section{Sprawdzenie poprawności żądań HTTP}
+
+Zadaniem tego modułu jest analiza treści pliku w celu znalezienia poprawnych żądań.
+
+\subsubsection{Gramatyka żądania HTTP}
+
+\begin{lstlisting}
+
+ Request        = Request-Line [request-header] CRLF
+ Request-Line   = Method SP Request-URI SP HTTP-Version CRLF 
+ request-header = *(field-name ":" [ field-value ] | Host) CRLF
+ field-name     = token
+ Method         = "OPTIONS" 
+                 |"GET"
+                 |"HEAD"
+                 |"POST" 
+                 |"PUT"
+                 |"DELETE" 
+                 |"TRACE" 
+                 |"CONNECT"
+ Request-URI    = "*" | absoluteURI | abs_path
+ HTTP-Version   = "HTTP" "/" 1*DIGIT "." 1*DIGIT
+ Host           = "Host" ":" host [ ":" port ] 
+ absoluteURI    = "http://" host [abs_path] [":" port]
+ field-value    = VALUE_TEXT
+ token          = TOKEN_TEXT
+ host           = HOST_TEXT
+ abs_path       = PATH_TEXT
+ port           = 1*DIGIT
+ SP             = " "
+ CRLF           = "\n"
+ DIGIT          = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+ HOST_TEXT    = "A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L"|
+               |"M"|"N"|"O"|"P"|"Q"|"R"|"S"|"T"|"U"|"V"|"W"|"X"|
+               |"Y"|"Z"|"a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i"|"j"|
+               |"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|
+               |"w"|"x"|"y"|"z"|"-"|"."| DIGIT
+ PATH_TEXT    = HOST_TEXT |"_"|"~"|":"|"/"|"?"|"#"|"["|"]"|
+               |"@"|"!"|"$"|"&"|"'"|"("|")"|"*"|"+"|","|";"|"="
+ VALUE_TEXT   = *(TOKEN_TEXT | ":")
+ TOKEN_TEXT   = *<all characters excluding CR LF ":">
+
+\end{lstlisting}
+
+\subsection{Request}
+
+\begin{lstlisting}
+
+ Request = Request-Line [header] CRLF
+ 
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Request()}
+
+\begin{lstlisting}
+
+ void Request(File file) {
+   
+   // kursor odpowiada pozycji sprawdzanego znaku w file
+   long request_cursor = 0;
+   // dlugość pliku
+   long file_length = file.getLength();
+   // petla sprawdzajaca czy w pliku znajduje się Request-Line
+   while (request_cursor < file_length) {
+   
+     // sprawdź czy od pozycji request_cursor
+     // może rozpoczynać się Request line
+     // jeśli Request-Line() znajdzie Request-Line
+     //   request-line_cursor odpowiada pozycji w pliku za
+     //   Request-Line 
+     // jeśli nie znajdzie
+     //   jest równa NOT_FOUND   
+     long request-line_cursor = /
+                 Request-Line (request_cursor, file);
+         
+     // Wykryto Request-Line
+     // sprawdź czy w pliku znajdują się pola nagłówka
+     if (request-line_cursor != NOT_FOUND) {
+             
+       // header jest opcjonalny - jeśli nie jest obecny
+       //   to header_cursor równe jest request-line_cursor
+       // w przeciwnym razie odpowiada pozycji za header'em
+       header_cursor = header(request-line_cursor, file);
+             
+       // zakończ pętlę
+       break;
+       
+     }
+     // przesuń kursor, ponieważ nie znaleziono żądania
+     request_cursor++; 
+   }
+ }
+ 
+\end{lstlisting}
+
+\subsection{Request-Line}
+
+\begin{lstlisting}
+
+ Request-Line = Method SP Request-URI SP HTTP-Version CRLF
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Request-Line()}
+
+\begin{lstlisting}
+
+ int Request-Line (long request-line_cursor, File file) {
+   // sprawdź czy znaleziono metodę
+   long method_cursor = Method (request-line_cursor, file);
+   // zwró
+   if (method_cursor == NOT_FOUND) {
+      // jeśli nie znaleziono Method zwróć niepowodzenie
+      return NOT_FOUND;
+   }
+   // sprawdź czy za Method znajduje się znak SP
+   char ch = file.getChar(method_cursor);
+   if (ch == SP) {
+     method_cursor++;
+     long request-uri_cursor = Request-URI (method_cursor, file)
+     if (request-uri_cursor == NOT_FOUND) {
+       // jeśli nie znaleziono Method zwróć niepowodzenie
+       return NOT_FOUND;
+     }
+   } else {
+     // jeśli nie znaleziono SP zwróć niepowodzenie
+     return NOT_FOUND;
+   }
+   
+   // sprawdź czy za Request-URI jest SP
+   ch = file.getChar(request-uri_cursor);
+   
+   if (ch == SP) {
+     // sprawdzamy poprawność HTTP-Version
+     request-uri_cursor++;
+     long http-version_cursor = /
+         HTTP-Version (request-uri_cursor, file);
+     // jeśli nie znaleziono zwróć niepowodzenie     
+     if (http-version_cursor == NOT_FOUND) {
+       return NOT_FOUND;
+     }
+   } else {
+     // nie znaleziono znaku SP - niepowodzenie
+     return NOT_FOUND;   
+   }
+   // sprawdź czy za HTTP-VERSION jest CRLF
+   ch = file.getChar(http_version_cursor);
+   if (ch == CRLF) {
+     // Sprawdzanie Request-Line zakończone powodzeniem
+     return ++http_version_cursor; 
+   } else {
+     // nie znaleziono znaku CRLF - niepowodzenie
+     return NOT_FOUND;   
+   }
+ }
+
+\end{lstlisting}
+
+\subsection{Method}
+
+\begin{lstlisting}
+
+ Method = "OPTIONS" 
+        | "GET"
+        | "HEAD"
+        | "POST"
+        | "PUT"
+        | "DELETE"
+        | "TRACE"
+        | "CONNECT"
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Method()}
+
+\begin{lstlisting}
+
+ long Method (long method_cursor, File file) {
+   
+   // sprawdź od pozycji method_cursor w pliku file
+   // rozpoczynają się tablice znaków z Method_array
+   // w przypadku niepowodzenia zwróć NOT_FOUND
+   // w przypadku powodzenia zwróć pozycję za znalezioną metodą 
+   
+   // zaraportuj rezultat
+   Log.report(METHOD, method);
+ 
+ }
+
+\end{lstlisting}
+
+\subsection{Request-URI}
+
+\begin{lstlisting}
+
+ Request-URI = "*" | absoluteURI | abs_path
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Request-URI()}
+
+\begin{lstlisting}
+
+ long Request-URI (long request_uri_cursor, File file) {
+   char ch = file.getChar(request_uri_cursor);
+   // wybierz odpowiednią opcję na podstawie pierwszego znaku   
+   switch (ch) {
+     case '*':
+       return ++request_uri_cursor;
+     case 'h':
+       long absolute_uri_cursor = /
+           absoluteURI(request_uri_cursor, file);
+       // nie znaleziono absoluteURI
+       if (absolute_uri_cursor == NOT_FOUND) {
+         return NOT_FOUND
+       } else {
+         // zwróć poprawny wynik
+         return absolute_uri_cursor;       
+       }
+     case '/':
+       long abs_path = abs_path(request_uri_cursor, file);
+       nie znaleziono abs_path
+       if (abs_path_cursor == NOT_FOUND) {
+         return NOT_FOUND
+       } else {
+         // zwróć poprawny wynik
+         return abs_path_cursor;       
+       }
+     default:
+       return NOT_FOUND;
+   }  
+ }
+
+\end{lstlisting}
+
+\subsection{absoluteURI}
+
+\begin{lstlisting}
+
+ absoluteURI = "http://" host [abs_path] [":" port]
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji absoluteURI()}
+
+\begin{lstlisting}
+
+ long absoluteURI (long absolute_uri_cursor, File file) {
+   // sprawdź czy w pliku jest tekst "http://"
+   String http = file.getString (absolute_uri_cursor, 7);
+   // jeśli nie znaleziono zwróć informację
+   if (!http.equals("http://") {
+     return NOT_FOUND;
+   }
+   // przesuń kursor poza znaleziony tekst
+   absolute_uri_cursor += 7;
+   // sprawdź obecność host
+   long host_cursor = host (absolute_uri_cursor, file);
+   // jeśli nie znaleziono zwróć informację
+   if (host == NOT_FOUND) {
+     return NOT_FOUND;
+   }   
+   // sprawdź obecność abs_path, jest to pole opcjonalne
+   long abs_path_cursor = abs_path (host_cursor, file);
+   // jeśli za zwróconym kursorem jest ":" sprawdź port
+   char ch = getChar (abs_path_cursor, file);
+   if (ch == ':') {
+     ++abs_path_cursor;
+     long port_cursor = port (abs_path_cursor, file);
+     return port_cursor;
+   }
+   // zwróć nową pozycję kursora
+   return host_cursor;   
+ }
+
+\end{lstlisting}
+
+\subsection{host}
+
+\begin{lstlisting}
+
+ host         = 1*HOST_TEXT
+ HOST_TEXT    = "A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L"|
+               |"M"|"N"|"O"|"P"|"Q"|"R"|"S"|"T"|"U"|"V"|"W"|"X"|
+               |"Y"|"Z"|"a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i"|"j"|
+               |"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|
+               |"w"|"x"|"y"|"z"|"0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|
+               |"8"|"9"|"-"|"."
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji host}
+
+\begin{lstlisting}
+
+ long host (long host_cursor, File file) {
+ 
+   // pobieraj znaki aż napotkasz " ", ":" lub "/"
+   //   zwróć kursor za sprawdzanonym tekstem
+   // jeśli znak nie należy do HOST_TEXT zwróć NOT_FOUND
+   
+   // zaraportuj dane
+   Log.report (HOST, host);
+   
+ }
+
+\end{lstlisting}
+
+\subsection{port}
+
+\begin{lstlisting}
+
+ port  = 1*DIGIT
+ DIGIT = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji port}
+
+\begin{lstlisting}
+
+ long port (long port_cursor, File file) {
+ 
+   // pobieraj kolejne znaki póki są cyframi
+   //   koniecznie co najmniej jedna cyfra
+   // jeśli stworzona liczba zmieści się w przedziale
+   //   zwróć kursor za ostatnią liczbą
+   // w każdym innym przypadku NOT_FOUND
+      
+ }
+
+\end{lstlisting}
+
+\subsection{abs path}
+
+\begin{lstlisting}
+
+ abs_path     = 1*PATH_TEXT
+ PATH_TEXT    = "A"|"B"|"C"|"D"|"E"|"F"|"G"|"H"|"I"|"J"|"K"|"L"|
+               |"M"|"N"|"O"|"P"|"Q"|"R"|"S"|"T"|"U"|"V"|"W"|"X"|
+               |"Y"|"Z"|"a"|"b"|"c"|"d"|"e"|"f"|"g"|"h"|"i"|"j"|
+               |"k"|"l"|"m"|"n"|"o"|"p"|"q"|"r"|"s"|"t"|"u"|"v"|
+               |"w"|"x"|"y"|"z"|"0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|
+               |"8"|"9"|"-"|"."|"_"|"~"|":"|"/"|"?"|"#"|"["|"]"|
+               |"@"|"!"|"$"|"&"|"'"|"("|")"|"*"|"+"|","|";"|"="
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji abs path()}
+
+\begin{lstlisting}
+
+ long abs_path (long abs_path_cursor, File file) {
+ 
+   char ch = getChar (abs_path_cursor, file);
+   
+   // pobieraj znaki aż napotkasz " " lub ":"
+   //   zwróć kursor za sprawdzonym tekstem
+   // jeśli znak nie należy do PATH_TEXT zwróć NOT_FOUND
+     
+ }
+
+\end{lstlisting}
+
+\subsection{HTTP-Version}
+
+\begin{lstlisting}
+
+ HTTP-Version = "HTTP" "/" 1*DIGIT "." 1*DIGIT
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji HTTP-Version()}
+
+\begin{lstlisting}
+
+ long HTTP-Version (long http_version_cursor, File file) {
+     // sprawdź czy od pozycji kursora znaki w pliku
+     //   są równe "HTTP/"
+     // pobieraj znak po znaku cyfry aż do spotkania "."
+     //   jeśli spotkasz inny znak niż cyfrę - zwróć NOT_FOUND
+     //   musi być co najmniej jedna cyfra
+     // pobieraj znak po znaku cyfry aż do spotkania CRLF
+     //   analogicznie jak wcześniej
+ }
+
+\end{lstlisting}
+
+\subsection{request-header}
+
+\begin{lstlisting}
+
+ request-header = *(field-name ":" [field-value] | Host) CRLF
+ field-name     = token
+ field-value    = VALUE_TEXT
+ token          = TOKEN_TEXT
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji request-header()}
+
+\begin{lstlisting}
+
+ long request-header(long request-header_cursor, File file) {
+   // (*) pobieraj znaki aż do spotkania ":"
+   // utwórz z nich String field-name
+   //   jeśli field-name równe "Host" rozpatrz ten przypadek
+   //   jeśli nie pobieraj znaki za ":", aż do spotkania CRLF
+   //     jeśli kolejny to znów CRLF
+   //       zwróć pozycję nowego kursora
+   //     jeśli to inny znak to wróć do (*)
+   // w przypadku niepowodzenia zwróć niezmienioną pozycję
+   // request_header_cursor
+ }
+
+\end{lstlisting}
+
+\subsection{Host}
+
+\begin{lstlisting}
+
+ Host = "Host" ":" host [ ":" port ] 
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Host()}
+
+\begin{lstlisting}
+
+ long Host(long host_cursor, File file) {
+ 
+   // sprawdź, czy za "Host:" znajduje się host
+   // sprawdź, czy za hostem znajduje się port - pole opcjonalne
+ } 
+
+\end{lstlisting}
+
+\section{Sprawdzenie poprawności odpowiedzi HTTP}
+
+Zadaniem tego modułu jest analiza treści pliku w celu znalezienia poprawnych odpowiedzi.
+
+\subsubsection{Gramatyka odpowiedzi HTTP}
+
+\begin{lstlisting}
+
+ Response        = Status-Line [response-header] 
+                   CRLF [message-body]
+ Status-Line     = HTTP-Version SP Status-Code SP 
+                   Reason-Phrase CRLF 
+ response-header = (field-name ":" [field-value] 
+                 | Content-Length) CRLF
+ field-name      = token
+ field-value     = VALUE_TEXT
+ token           = 1*(TOKEN_TEXT)
+ Status-Code     = "100"  ; Continue
+                 | "101"  ; Switching Protocols
+                 | "200"  ; OK
+                 | "201"  ; Created
+                 | "202"  ; Accepted
+                 | "203"  ; Non-Authoritative Information
+                 | "204"  ; No Content
+                 | "205"  ; Reset Content
+                 | "206"  ; Partial Content
+                 | "300"  ; Multiple Choices
+                 | "302"  ; Found
+                 | "303"  ; See Other
+                 | "304"  ; Not Modified
+                 | "305"  ; Use Proxy
+                 | "307"  ; Temporary Redirect
+                 | "400"  ; Bad Request
+                 | "401"  ; Unauthorized
+                 | "402"  ; Payment Required
+                 | "403"  ; Forbidden
+                 | "404"  ; Not Found
+                 | "405"  ; Method Not Allowed
+                 | "406"  ; Not Acceptable
+                 | "407"  ; Proxy Authentication Required
+                 | "408"  ; Request Time-out
+                 | "409"  ; Conflict
+                 | "410"  ; Gone
+                 | "411"  ; Length Required
+                 | "412"  ; Precondition Failed
+                 | "413"  ; Request Entity Too Large
+                 | "414"  ; Request-URI Too Large
+                 | "415"  ; Unsupported Media Type
+                 | "416"  ; Requested range not satisfiable
+                 | "417"  ; Expectation Failed
+                 | "500"  ; Internal Server Error
+                 | "501"  ; Not Implemented
+                 | "502"  ; Bad Gateway
+                 | "503"  ; Service Unavailable
+                 | "504"  ; Gateway Time-out
+                 | "505"  ; HTTP Version not supported
+
+ HTTP-Version    = "HTTP" "/" 1*DIGIT "." 1*DIGIT
+ Reason-Phrase   = 1*VALUE_TEXT
+ Content-Length  = "Content-Length" ":" 1*DIGIT 
+ SP              = " "
+ CRLF            = "\n"
+ DIGIT           = "0"|"1"|"2"|"3"|"4"|"5"|"6"|"7"|"8"|"9"
+ TOKEN_TEXT      = 1*(<all characters excluding CR LF ":">)
+ VALUE_TEXT      = 1*(TOKEN_TEXT | ":")
+
+\end{lstlisting}
+
+\subsection{Response}
+
+\begin{lstlisting}
+
+ Response = Status-Line [response-header] CRLF [message-body]
+ 
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Response()}
+
+\begin{lstlisting}
+
+ void Response(File file) {
+   
+   // kursor odpowiada pozycji sprawdzanego znaku w file
+   long response_cursor = 0;
+   // dlugość pliku
+   long file_length = file.getLength();
+   // petla sprawdzajaca czy w pliku znajduje się Response-Line
+   while (response_cursor < file_length) {
+   
+     // sprawdź czy od pozycji response_cursor
+     // może rozpoczynać się Status-Line
+     // jeśli Status-Line() znajdzie Status-Line
+     //   status_line_cursor odpowiada pozycji w pliku za
+     //   Status-Line 
+     // jeśli nie znajdzie
+     //   jest równa NOT_FOUND   
+     long status_line_cursor = /
+                 Status-Line (request_cursor, file);
+         
+     // Wykryto Status-Line
+     // sprawdź czy w pliku znajdują się pola nagłówka
+     if (status_line_cursor != NOT_FOUND) {
+             
+       // header jest opcjonalny - jeśli nie jest obecny
+       //   to header_cursor równe jest status_line_cursor
+       // w przeciwnym razie odpowiada pozycji za header'em
+       header_cursor = response_header(status_line_cursor, file);
+             
+       // sprawdź message-body i stwórz plik z danymi        
+       message-body(header_cursor, file);
+       // zakończ pętlę
+       break;
+       
+     }
+     // przesuń kursor, ponieważ nie znaleziono żądania
+     response_cursor++; 
+   }
+ }
+ 
+\end{lstlisting}
+
+\subsection{Status-Line}
+
+\begin{lstlisting}
+
+ Status-Line = HTTP-Version SP Status-Code SP Reason-Phrase CRLF
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Status-Line()}
+
+\begin{lstlisting}
+
+ long Status-Line (long status_line_cursor, File file) {
+   // sprawdź czy znaleziono metodę
+   long http_version__cursor = HTTP-Version (status_line_cursor, file);
+   // zwróć niepowodzenie w razie nie znalezienia
+   if (http_version_cursor == NOT_FOUND) {
+      // jeśli nie znaleziono Method zwróć niepowodzenie
+      return NOT_FOUND;
+   }
+   // sprawdź czy za Method znajduje się znak SP
+   char ch = file.getChar(http_version_cursor);
+   if (ch == SP) {
+     http_version_cursor++;
+     long status_code_cursor = Status-Code (http_version_cursor, file)
+     if (status_code_cursor == NOT_FOUND) {
+       // jeśli nie znaleziono Status-Code zwróć niepowodzenie
+       return NOT_FOUND;
+     }
+   } else {
+     // jeśli nie znaleziono SP zwróć niepowodzenie
+     return NOT_FOUND;
+   }
+   
+   // sprawdź czy za Status-Code jest SP
+   ch = file.getChar(status_code_cursor);
+   
+   if (ch == SP) {
+     // sprawdzamy poprawność Reason-Phrase
+     status_code_cursor++;
+     long reason_phrase_cursor = /
+         Reason-Phrase (status_code_cursor, file);
+     // jeśli nie znaleziono zwróć niepowodzenie     
+     if (reason_phrase_cursor == NOT_FOUND) {
+       return NOT_FOUND;
+     }
+   } else {
+     // nie znaleziono znaku SP - niepowodzenie
+     return NOT_FOUND;   
+   }
+   // sprawdź czy za Reason-Phrase jest CRLF
+   ch = file.getChar(reason_phrase_cursor);
+   if (ch == CRLF) {
+     // Sprawdzanie Reason-Phrase zakończone powodzeniem
+     return ++reason_phrase_cursor; 
+   } else {
+     // nie znaleziono znaku CRLF - niepowodzenie
+     return NOT_FOUND;   
+   }
+ }
+ 
+\end{lstlisting}
+
+\subsection{HTTP-Version}
+
+\begin{lstlisting}
+
+ HTTP-Version = "HTTP" "/" 1*DIGIT "." 1*DIGIT
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji HTTP-Version()}
+
+\begin{lstlisting}
+
+ long HTTP-Version (long http_version_cursor, File file) {
+     
+     // sprawdź czy od pozycji kursora znaki w pliku
+     //   są równe "HTTP/"
+     // pobieraj znak po znaku cyfry aż do spotkania "."
+     //   jeśli spotkasz inny znak niż cyfrę - zwróć NOT_FOUND
+     //   musi być co najmniej jedna cyfra
+     // pobieraj znak po znaku cyfry aż do spotkania SP
+     //   analogicznie jak wcześniej
+ }
+
+\end{lstlisting}
+
+\subsection{Status-Code}
+
+\begin{lstlisting}
+
+ Status-Code = "100"  ; Continue
+             | "101"  ; Switching Protocols
+             | "200"  ; OK
+             | "201"  ; Created
+             | "202"  ; Accepted
+             | "203"  ; Non-Authoritative Information
+             | "204"  ; No Content
+             | "205"  ; Reset Content
+             | "206"  ; Partial Content
+             | "300"  ; Multiple Choices
+             | "301"  ; Moved Permanently
+             | "302"  ; Found
+             | "303"  ; See Other
+             | "304"  ; Not Modified
+             | "305"  ; Use Proxy
+             | "307"  ; Temporary Redirect
+             | "400"  ; Bad Request
+             | "401"  ; Unauthorized
+             | "402"  ; Payment Required
+             | "403"  ; Forbidden
+             | "404"  ; Not Found
+             | "405"  ; Method Not Allowed
+             | "406"  ; Not Acceptable
+             | "407"  ; Proxy Authentication Required
+             | "408"  ; Request Time-out
+             | "409"  ; Conflict
+             | "410"  ; Gone
+             | "411"  ; Length Required
+             | "412"  ; Precondition Failed
+             | "413"  ; Request Entity Too Large
+             | "414"  ; Request-URI Too Large
+             | "415"  ; Unsupported Media Type
+             | "416"  ; Requested range not satisfiable
+             | "417"  ; Expectation Failed
+             | "500"  ; Internal Server Error
+             | "501"  ; Not Implemented
+             | "502"  ; Bad Gateway
+             | "503"  ; Service Unavailable
+             | "504"  ; Gateway Time-out
+             | "505"  ; HTTP Version not supported
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Status-Code()}
+
+\begin{lstlisting}
+
+ long Status-Code (long method_cursor, File file) {
+   
+   // pobierz trzy znaki od pozycji kursora
+   String code_text = file.getString(method_cursor, 3);
+   // przekształć znaki na liczbę
+   int code = atoi(code_text);
+   // jeśli code_text nie trzech cyfr zwróć niepowodzenie   
+   if (code == -1) {
+     return NOT_FOUND;
+   } else {
+     // sprawdź czy code znajduje się w tablicy Status-Code
+     for (int i=0; i<Status-Code_Array.size(); i++) {
+       if (code == Status-Code_Array[i]) {
+          return method_cursor+3;
+       }
+     }
+   }  
+   return NOT_FOUND;
+ }
+
+\end{lstlisting}
+
+\subsection{Reason-Phrase}
+
+\begin{lstlisting}
+
+ Reason-Phrase   = *TEXT 
+ TEXT            = <all characters excluding CR, LF>
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Reason-Phrase()}
+
+\begin{lstlisting}
+
+ long Reason-Phrase (long request_uri_cursor, File file) {
+   // pobieraj znaki z file począwszy od request_uri_cursor
+   //   aż do napotkania CR LF
+   // zwróć pozycję za ostatnim pobranym znakiem
+ }
+
+\end{lstlisting}
+
+\subsection{response-header}
+
+\begin{lstlisting}
+
+ response-header = (field-name ":" [field-value] 
+                 | Content-Length) CRLF
+ field-name      = token
+ field-value     = VALUE_TEXT
+ token           = 1*(TOKEN_TEXT)
+ TOKEN_TEXT      = 1*(<all characters excluding CR LF ":">)
+ VALUE_TEXT      = 1*(TOKEN_TEXT | ":")
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji response-header()}
+
+\begin{lstlisting}
+
+ long response-header(long response_header_cursor, File file) {
+   // (*) pobieraj znaki aż do spotkania ":"
+   // utwórz z nich String field_name
+   //   jeśli field-name równe "Content_Length" rozpatrz ten przypadek
+   //   jeśli nie pobieraj znaki za ":", aż do spotkania CRLF
+   //     jeśli kolejny to znów CRLF
+   //       zwróć pozycję nowego kursora
+   //     jeśli to inny znak to wróć do (*)
+   // zwróć pozycję nowego kursora
+   // w przypadku niepowodzenia zwróć niezmienioną pozycję
+   // response_header_cursor
+ }
+
+\end{lstlisting}
+
+\subsection{Content-Length}
+
+\begin{lstlisting}
+
+ Content-Length = "Content-Length" ":" 1*DIGIT
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji Content-Length()}
+
+\begin{lstlisting}
+
+ long Content-Length (long absolute_uri_cursor, File file) {
+ 
+   // sprawdź, czy za "Content-Length:" znajduje się ciąg cyfr
+   //   przy czym musi być to conajmniej jedna cyfra
+   //   pobieraj cyfry aż do spotkania znaku CRLF
+   //   w przypadku znaku spoza zakresu zwróć niepowodzenie
+   
+   // zaraportuj dane
+   Log.report (CONTENT_LENGTH, content_length); 
+ }
+
+\end{lstlisting}
+
+\subsection{message-body}
+
+\begin{lstlisting}
+
+ message-body  = *TEXT
+
+\end{lstlisting}
+
+\subsubsection{Pseudokod funkcji message-body()}
+
+\begin{lstlisting}
+
+ long message-body(long message_body_cursor, File file) {
+ 
+   // utwórz tablicę bajtów 
+   //   od message_body_cursor aż do końca pliku
+   // utwórz z tej tablicy plik np. wysyłając tablicę 
+   //   do funkcji logującej, która będzie to obsługiwała
+   Log.report (CREATE_FILE, message_body_array);
+ } 
+
+\end{lstlisting}
+
+\section{Logowanie poprawnych sesji i tworzenie statystyk}
+
+\subsection{Klasa Log}
+
+Klasa, której statyczne metody będą zapisywać dane służące do tworzenia statystyk oraz informowania użytkownika o wszelkiego rodzaju błędach i etapach działania programu.
+
+\subsection{Funkcja start()}
+
+Rozpoczyna sesję dla danego pliku
+
+\subsection{Funkcja finish()}
+
+Kończy sesję dla danego pliku
+
+\subsection{Funkcja report()}
+
+Zaraportuj zdarzenie dla sesji pliku lub skanowania
+Działa i wypisuje dane na konsole lub do pliku, w zależności od określonych przez użytkownika parametrów.
+Dzięki niej raportowane są zdarzenia takie jak:
+
+\begin{itemize}
+\item HOST - przesłanie nazwy hosta
+\item ABS PATH - ścieżka do pliku na serwerze
+\item CONTENT LENGTH - przesłanie długości pliku
+\item CREATE FILE - utworzenie dodatkowego pliku z danymi
+\item RESPONSE RESULT - rezultat działania sprawdzania odpowiedzi
+\item REQUEST RESULT - rezultat działania sprawdzania żądania
+\end{itemize}
+
+\section{Interfejs użytkownika}
+
+Moduł interfejsu będzie opierał się na trybie tekstowym. Użytkownik jako argument wywołania programu może podać ścieżkę z katalogiem plików, które zostaną przefiltrowane i zostaje informowany o postępach programu.
+Domyślne ustawienia programu użytkownik może zmieniać, edytując plik httpparser.conf
+
+\chapter{Sposób użycia}
+
+\section{Polecenia}
+
+\subsection{Uruchomienie programu}
+
+\begin{lstlisting}
+
+ ./httpparser <commands>
+  
+  <commands> : 
+     -d <directory_path>
+     -l <log_file_name>
+     -r - filtrowanie wszystkich możliwych danych
+     --host - filtrowanie hostów
+     --content-length - filtrowanie content-length
+     --url - filtrowanie url
+     
+\end{lstlisting}
+
+\section{Plik ustawień httpparser.conf}
+
+\begin{lstlisting}
+
+ # DEFAULT DIRECTORY
+ ~/httpparser/files
+ # DEFAULT LOG DIRECTORY
+ ~/httpparser/log
+ # DEFAULT LOG FILE
+ ~/httpparser/log/default.log
+ # DEFAULT STAT LOG FILE
+ ~/httpparser/log/default_stat.log
+ # DEFAULT OUTPUT FILES DIRECTORY
+ ~/httpparser/output
+ 
+ # FILTER OPTIONS
+ HOST # przesłanie nazwy hosta
+ ABS_PATH # ścieżka do pliku na serwerze
+ CONTENT_LENGTH # przesłanie długości pliku
+ CREATE_FILE # utworzenie dodatkowego pliku z danymi
+ RESPONSE_ERESULT # rezultat działania sprawdzania odpowiedzi
+ REQUEST_RESULT # rezultat działania sprawdzania żądania
+ URL # adres url
+  
+\end{lstlisting}
+
+\section{Priorytet ustawień}
+
+\begin{enumerate}
+
+\item Ustawienia z linii poleceń
+\item Ustawienia z pliku httpparser.conf
+
+\end{enumerate}
+
+\section{Plik statystyk}
+
+\subsection{Format danych}
+
+\begin{lstlisting}  
+
+ // dla każdego znalezionego pliku z żądaniem HTTP, w jednej linii 
+ nazwa_pliku_z_żądaniem_HTTP ";" metoda ";" URL ";" 
+ wielkość_pliku ";" nazwa_pliku_z_przesyłaną treścią <CRLF>
+ 
+\end{lstlisting}
+
+\subsection{Nazwa pliku}
+
+\begin{lstlisting}  
+
+ // domyślnie
+ default_stat.log
+ 
+\end{lstlisting}
+
+\section{Pliki danych wyjściowych}
+
+\subsection{Format danych}
+
+Ponieważ wygenerowane dane mogą być zarówno w formacie tekstowym, jak i binarnym, będę zapisywał je w dwóch rodzajach plików.
+
+\begin{itemize}
+
+\item .txt - pliki tekstowe
+\item .bin - pliki binarne 
+
+\end{itemize}
+
+\subsection{Nazwa pliku - schemat}
+
+\begin{lstlisting}
+
+5_cyfrowy_numer_pliku + "_" + nazwa_pliku_z_żądaniem + ".bin"
+5_cyfrowy_numer_pliku + "_" + nazwa_pliku_z_żądaniem + ".txt"
+
+\end{lstlisting}
+
+\subsection{Przykładowe nazwy plików wyjściowych}
+
+\begin{lstlisting}
+
+00000_023.061.248.096.00443-192.168.000.011.56132.bin
+00001_023.061.248.090.00443-192.168.000.011.54796.bin
+00002_023.061.248.090.00443-192.168.000.011.54792.txt
+
+\end{lstlisting}
+
+\end{document}

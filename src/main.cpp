@@ -8,7 +8,7 @@ void help() {
     printf("-s <stat_directory>\n");
     printf("-f <stat_file>\n");
     printf("-o <output_directory>\n");
-    printf("-d <files_directory>\n");
+    printf("-i <input_directory>\n");
 }
 
 int main(int argc, char** argv) {
@@ -16,12 +16,13 @@ int main(int argc, char** argv) {
     std::string stat_directory = "";
     std::string stat_file = "";
     std::string output_directory = "";
-    std::string files_directory = "";
+    std::string input_directory = "";
 
     std::ifstream settings_file("http_parser.conf");
 
-    if (settings_file.is_open()) {
-        for(std::string line; std::getline(settings_file, line);) {
+	if (settings_file.is_open()) {
+
+		for(std::string line; std::getline(settings_file, line);) {
             if (line.length() < 4) {
                 continue;
             }
@@ -29,13 +30,13 @@ int main(int argc, char** argv) {
                 continue;
             }
             if (line[1] == 's') {
-                stat_directory = line.substr(4);
-            } else if (line[1] == 'd') {
-                files_directory = line.substr(4);
+                stat_directory = line.substr(3);
+            } else if (line[1] == 'i') {
+                input_directory = line.substr(3);
             } else if (line[1] == 'f') {
-                stat_file = line.substr(4);
+                stat_file = line.substr(3);
             } else if (line[1] == 'o') {
-                output_directory = line.substr(4);
+                output_directory = line.substr(3);
             }
         }
     }
@@ -51,8 +52,8 @@ int main(int argc, char** argv) {
                 case 'f':
                     stat_file = argv[i+1];
                     break;
-                case 'd':
-                    files_directory = argv[i+1];
+                case 'i':
+                    input_directory = argv[i+1];
                     break;
                 case 'o':
                     output_directory = argv[i+1];
@@ -66,9 +67,11 @@ int main(int argc, char** argv) {
     }
 
     if (output_directory.length() == 0) return -1;
-    if (files_directory.length() == 0) return -1;
+    if (input_directory.length() == 0) return -1;
     if (stat_file.length() == 0) return -1;
     if (stat_directory.length() == 0) return -1;
-    checkDirectory(stat_file, stat_directory, files_directory, output_directory);
+
+    checkDirectory(stat_file, stat_directory, input_directory, output_directory);
+
 	return 0;
 }

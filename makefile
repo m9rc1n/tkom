@@ -1,4 +1,4 @@
-TARGET   = http_version
+TARGET   = http_parser
 CC       = clang++
 # compiling flags here
 CFLAGS   = -Wall -I.

@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>dirent</id>
+    <version>1.13.1</version>
+    <title>Dirent API for Windows</title>
+    <authors>Toni Ronkko,  Garrett Serack</authors>
+    <owners>Toni Ronkko,  Garrett Serack</owners>
+    <licenseUrl>https://raw.github.com/fearthecowboy/dirent/master/LICENSE.TXT</licenseUrl>
+    <projectUrl>http://softagalleria.net/download/dirent/?C=M;O=D</projectUrl>
+    <iconUrl>https://secure.gravatar.com/avatar/19ff93f7193d9bd9effcc1b0f5d5151c?s=420&amp;d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-org-420.png;
+		requireLicenseAcceptance:false</iconUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>dirent.h - dirent API for Microsoft Visual Studio</description>
+    <summary>dirent.h - dirent API for Microsoft Visual Studio</summary>
+    <releaseNotes>...</releaseNotes>
+    <copyright>Copyright (C) 2006-2012 Toni Ronkko</copyright>
+    <tags>dirent native CoApp</tags>
+  </metadata>
+</package>

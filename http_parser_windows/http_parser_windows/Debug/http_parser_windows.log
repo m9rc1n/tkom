@@ -1,0 +1,16 @@
+﻿Build started 2014-05-12 19:27:50.
+     1>Project "D:\marcin\Projects\tkom\http_parser_windows\http_parser_windows\http_parser_windows.vcxproj" on node 2 (Build target(s)).
+     1>Link:
+         C:\Program Files (x86)\Microsoft Visual Studio 12.0\VC\bin\link.exe /ERRORREPORT:PROMPT /OUT:"D:\marcin\Projects\tkom\http_parser_windows\Debug\http_parser_windows.exe" /INCREMENTAL /NOLOGO kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /DEBUG /PDB:"D:\marcin\Projects\tkom\http_parser_windows\Debug\http_parser_windows.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"D:\marcin\Projects\tkom\http_parser_windows\Debug\http_parser_windows.lib" /MACHINE:X86 Debug\file.obj
+         Debug\file_name.obj
+         Debug\log.obj
+         Debug\main.obj
+         Debug\request.obj
+         Debug\response.obj
+         Debug\ui.obj
+         http_parser_windows.vcxproj -> D:\marcin\Projects\tkom\http_parser_windows\Debug\http_parser_windows.exe
+     1>Done Building Project "D:\marcin\Projects\tkom\http_parser_windows\http_parser_windows\http_parser_windows.vcxproj" (Build target(s)).
+
+Build succeeded.
+
+Time Elapsed 00:00:02.35

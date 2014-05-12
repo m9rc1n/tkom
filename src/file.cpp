@@ -23,14 +23,31 @@ std::vector<std::string> getFilesFromDirectory(std::string path) {
 	}
 
 	while(entry = readdir(dp)) {
-	//	printf("%s\n", entry->d_name);
 		result.push_back(entry->d_name);
-		// puts(entry->d_name);
 	}
 
 	closedir(dp);
 
 	return result;
+}
+
+void checkFile (std::string input, std::string &file) {
+
+    std::ifstream f((input+file).c_str());
+    long length;
+    f.seekg(0, f.end);
+    length = f.tellg();
+    f.seekg(0, f.beg);
+    char ch;
+	int i = 0;
+
+	do {
+		ch = f.get();
+		i++;
+	} while (ch != 10);
+
+	f.seekg(i);
+    f.close();
 }
 
 bool isRequestFileNameIncorrect (std::string filename) {
@@ -57,7 +74,11 @@ void checkDirectory(std::string stat_file, std::string stat_directory, std::stri
 	// report (SCAN_RESULT, STARTED);
 	// lista plikow w zadanym katalogu
 	std::vector<std::string> files = getFilesFromDirectory(input_directory);
-	// petla skanujaca dany katalog
+
+    // petla skanujaca dany katalog
+
+    report(OUTPUT, output_directory);
+    report(STAT, stat_file);
 
 	for(std::vector<std::string>::iterator file = files.begin(); file != files.end(); file++) {
 		// jesli plik nie ma poprawnej nazwy
@@ -65,17 +86,16 @@ void checkDirectory(std::string stat_file, std::string stat_directory, std::stri
 		if (isRequestFileNameIncorrect(*file)) {
 			continue;
 		}
-
 		// rozpocznij sesje z danym plikiem
 		// sprawdz, czy zadany plik zawiera zadanie HTTP
-		report (START, *file);
-		long request_state = request(input_directory, *file);
-		report (REQUEST_RESULT, request_state);
-		long response_state = response(input_directory, getResponseFileFromRequestFile(*file));
-		report (RESPONSE_RESULT, response_state);
-		report (FINISH, "log.txt");
-	}
-
-	// raportuj stan skanowania
-	//report (SCAN_RESULT, FINISHED);
+        report (START, *file);
+		int request_state = request(input_directory, *file);
+        if (request_state == SUCCESS) {
+            int response_state = response(input_directory, getResponseFileFromRequestFile(*file));
+		    report (FINISH, stat_file);
+        } else {
+            report (FINISH, stat_file);
+        }
+    }
 }
+

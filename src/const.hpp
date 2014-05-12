@@ -11,6 +11,9 @@ const int FINISH = 8;
 const int SUCCESS = 9;
 const int METHOD = 10;
 const int STATUS_CODE = 11;
+const int OUTPUT = 12;
+const int STAT = 13;
+const int EXTENSION = 14;
 
 const char SP = ' ';
 const char CR = 13;
